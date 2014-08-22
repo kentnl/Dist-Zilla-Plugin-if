@@ -796,7 +796,7 @@
             "config" : {
                "__PACKAGE__" : {
                   "conditions" : [
-                     "return unless -e $root . '/.gitf'"
+                     "-e $root . '/.gitf'"
                   ],
                   "plugin" : "Git::Contributors",
                   "plugin_arguments" : [

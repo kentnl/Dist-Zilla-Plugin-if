@@ -34,7 +34,7 @@ lsub plugin_package => sub {  my ( $self ) = @_; return Dist::Zilla::Util->expan
 
 sub mvp_aliases { return {
     '>' => 'plugin_arguments',
-    '+' => 'conditions',
+    '?' => 'conditions',
 }};
 sub mvp_multivalue_args { return qw( plugin_arguments prereq_to conditions ) }
 
@@ -65,12 +65,7 @@ sub check_conditions {
   my $env = { };
   $env->{ q[$root] } = \$self->zilla->root;
   $env->{ q[$zilla] } = \$self->zilla;
-  my $code = qq[];
-
-  for my $condition (@{ $self->conditions }){ 
-    $code .= $condition . qq[\n];
-  }
-  $code .= qq[; return 1;\n];
+  my $code = join qq[ and ], @{ $self->conditions };
   my $closure = eval_closure( 
       source => qq[sub { \n] . $code . qq[}\n],
       environment => $env,
