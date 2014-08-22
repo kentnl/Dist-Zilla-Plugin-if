@@ -13,8 +13,9 @@ our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 
 use Moose qw( has around with );
 use MooX::Lsub qw( lsub );
+use Dist::Zilla::Util qw();
 
-with 'Dist::Zilla::Role::Plugin';
+with 'Dist::Zilla::Role::PrereqSource';
 
 has plugin => ( is => ro =>, required => 1 );
 
@@ -26,18 +27,45 @@ lsub conditions => sub { [] };
 
 lsub plugin_arguments => sub { [] };
 
+lsub prereq_to => sub {[ 'develop.requires' ]};
+
+lsub plugin_package => sub {  my ( $self ) = @_; return Dist::Zilla::Util->expand_config_package_name($self->plugin); };
+
 sub mvp_aliases { return { '-' => 'plugin_arguments' }};
-sub mvp_multivalue_args { return qw( plugin_arguments ) }
+sub mvp_multivalue_args { return qw( plugin_arguments prereq_to ) }
+
+my $re_phases = qr/configure|build|test|runtime|develop/msx;
+my $re_relation = qr/requires|recommends|suggests|conflicts/msx;
+my $re_prereq = qr/\A($re_phases)[.]($re_relation)\z/msx;
+
+sub register_prereqs {
+  my ( $self ) = @_;
+  my $prereqs = $self->zilla->prereqs;
+ 
+  my @targets;
+
+  for my $prereq ( @{ $self->prereq_to }) {
+    if ( my ( $phase, $relation ) = $prereq =~ $re_prereq ) {
+      push @targets, $prereqs->requirements_for( $phase, $relation );
+    }
+  }
+  for my $target ( @targets ){
+    $target->add_string_requirement( $self->plugin_package, $self->plugin_minversion );
+  }
+  return;
+}
 
 around 'dump_config' => sub  {
   my ( $orig,  $self, @args ) = @_;
   my $config = $self->$orig( @args );
   my $own_payload = {
     plugin => $self->plugin,
+    plugin_package => $self->plugin_package,
     plugin_name => $self->plugin_name,
     plugin_minversion => $self->plugin_minversion,
     conditions => $self->conditions,
     plugin_arguments => $self->plugin_arguments,
+    prereq_to => $self->prereq_to,
   };
   $config->{ __PACKAGE__ } = $own_payload;
   return $config;

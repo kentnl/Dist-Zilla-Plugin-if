@@ -82,7 +82,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Dist::Zilla::Role::Plugin" : "0",
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "Dist::Zilla::Util" : "0",
             "MooX::Lsub" : "0",
             "Moose" : "0",
             "perl" : "5.008",
@@ -161,7 +162,8 @@
          "Dist::Zilla::Plugin::UploadToCPAN" : "5.020",
          "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.020000",
          "Dist::Zilla::PluginBundle::Author::KENTNL::Lite" : "2.001000",
-         "Dist::Zilla::Role::Plugin" : "5.020",
+         "Dist::Zilla::Role::PrereqSource" : "5.020",
+         "Dist::Zilla::Util" : "5.020",
          "ExtUtils::MakeMaker" : "6.98",
          "File::Spec" : "3.49",
          "MooX::Lsub" : "0.001003",
@@ -795,7 +797,11 @@
                   "plugin" : "Git::Contributors",
                   "plugin_arguments" : [],
                   "plugin_minversion" : 0,
-                  "plugin_name" : "if"
+                  "plugin_name" : "if",
+                  "plugin_package" : "Dist::Zilla::Plugin::Git::Contributors",
+                  "prereq_to" : [
+                     "develop.requires"
+                  ]
                }
             },
             "name" : "if",

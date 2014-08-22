@@ -20,7 +20,8 @@ provides:
     file: lib/Dist/Zilla/Plugin/if.pm
     version: '0.001000'
 requires:
-  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Dist::Zilla::Util: '0'
   MooX::Lsub: '0'
   Moose: '0'
   perl: '5.008'
@@ -77,7 +78,8 @@ x_BuiltWith:
     Dist::Zilla::Plugin::UploadToCPAN: '5.020'
     Dist::Zilla::PluginBundle::Author::KENTNL: '2.020000'
     Dist::Zilla::PluginBundle::Author::KENTNL::Lite: '2.001000'
-    Dist::Zilla::Role::Plugin: '5.020'
+    Dist::Zilla::Role::PrereqSource: '5.020'
+    Dist::Zilla::Util: '5.020'
     ExtUtils::MakeMaker: '6.98'
     File::Spec: '3.49'
     MooX::Lsub: '0.001003'
@@ -566,6 +568,9 @@ x_Dist_Zilla:
           plugin_arguments: []
           plugin_minversion: '0'
           plugin_name: if
+          plugin_package: Dist::Zilla::Plugin::Git::Contributors
+          prereq_to:
+            - develop.requires
       name: if
       version: '0.001000'
     -
