@@ -84,6 +84,7 @@
          "requires" : {
             "Dist::Zilla::Role::PrereqSource" : "0",
             "Dist::Zilla::Util" : "0",
+            "Eval::Closure" : "0",
             "MooX::Lsub" : "0",
             "Moose" : "0",
             "perl" : "5.008",
@@ -164,6 +165,7 @@
          "Dist::Zilla::PluginBundle::Author::KENTNL::Lite" : "2.001000",
          "Dist::Zilla::Role::PrereqSource" : "5.020",
          "Dist::Zilla::Util" : "5.020",
+         "Eval::Closure" : "0.11",
          "ExtUtils::MakeMaker" : "6.98",
          "File::Spec" : "3.49",
          "MooX::Lsub" : "0.001003",

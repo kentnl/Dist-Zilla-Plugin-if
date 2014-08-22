@@ -14,6 +14,7 @@ our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 use Moose qw( has around with );
 use MooX::Lsub qw( lsub );
 use Dist::Zilla::Util qw();
+use Eval::Closure qw( eval_closure );
 
 with 'Dist::Zilla::Role::PrereqSource';
 
@@ -55,6 +56,25 @@ sub register_prereqs {
   return;
 }
 
+sub check_conditions {
+  my ( $self ) = @_;
+
+  my $env = { };
+  $env->{ q[$root] } = \$self->zilla->root;
+  $env->{ q[$zilla] } = \$self->zilla;
+  my $code = qq[];
+
+  for my $condition (@{ $self->conditions }){ 
+    $code .= 'return unless (' . $condition . ');' . qq[\n];
+  }
+  $code .= qq[return 1;\n];
+  my $closure = eval_closure( 
+      source => qq[sub { \n] . $code . qq[}\n],
+      environment => $env,
+  );
+  return $closure->();
+}
+
 around 'dump_config' => sub  {
   my ( $orig,  $self, @args ) = @_;
   my $config = $self->$orig( @args );
@@ -69,6 +89,15 @@ around 'dump_config' => sub  {
   };
   $config->{ __PACKAGE__ } = $own_payload;
   return $config;
+};
+
+around 'plugin_from_config' => sub {
+  my ( $orig, $plugin_class, @args ) = @_;
+  my $instance = $plugin_class->$orig(@args);
+  if ( $instance->check_conditions ) {
+    warn "Conditions are OK :)";
+  }
+  return $instance;
 };
 
 __PACKAGE__->meta->make_immutable;
