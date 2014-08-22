@@ -1,0 +1,33 @@
+NAME
+    Dist::Zilla::Plugin::if - Load a plugin only if a condition is true
+
+VERSION
+    version 0.001000
+
+SYNOPSIS
+      [if / FooLoader]
+      plugin            = Git::Contributors
+      plugin_name       = KNL/Git::Contributors
+      plugin_minversion = 0.010
+      condition = -e $root . '.git'
+      condition = -e $root . '.git/config'
+      -= include_authors = 1
+      -= include_releaser = 0
+      -= order_by = name
+
+DESCRIPTION
+    "if" is intended to be a similar utility to perl "if".
+
+    It will execute all of "condition" in turn, and only when all return
+    true, will the plugin be added to "Dist::Zilla"
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
