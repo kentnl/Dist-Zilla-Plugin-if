@@ -795,7 +795,9 @@
             "class" : "Dist::Zilla::Plugin::if",
             "config" : {
                "__PACKAGE__" : {
-                  "conditions" : [],
+                  "conditions" : [
+                     "-e $root . '/.git'"
+                  ],
                   "plugin" : "Git::Contributors",
                   "plugin_arguments" : [],
                   "plugin_minversion" : 0,

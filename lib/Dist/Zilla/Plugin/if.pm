@@ -32,8 +32,11 @@ lsub prereq_to => sub {[ 'develop.requires' ]};
 
 lsub plugin_package => sub {  my ( $self ) = @_; return Dist::Zilla::Util->expand_config_package_name($self->plugin); };
 
-sub mvp_aliases { return { '-' => 'plugin_arguments' }};
-sub mvp_multivalue_args { return qw( plugin_arguments prereq_to ) }
+sub mvp_aliases { return {
+    '-' => 'plugin_arguments',
+    '+' => 'conditions',
+}};
+sub mvp_multivalue_args { return qw( plugin_arguments prereq_to conditions ) }
 
 my $re_phases = qr/configure|build|test|runtime|develop/msx;
 my $re_relation = qr/requires|recommends|suggests|conflicts/msx;
