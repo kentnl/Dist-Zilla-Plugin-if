@@ -33,7 +33,7 @@ lsub prereq_to => sub {[ 'develop.requires' ]};
 lsub plugin_package => sub {  my ( $self ) = @_; return Dist::Zilla::Util->expand_config_package_name($self->plugin); };
 
 sub mvp_aliases { return {
-    '-' => 'plugin_arguments',
+    '' => 'plugin_arguments',
     '+' => 'conditions',
 }};
 sub mvp_multivalue_args { return qw( plugin_arguments prereq_to conditions ) }
@@ -128,11 +128,11 @@ version 0.001000
   plugin            = Git::Contributors
   plugin_name       = KNL/Git::Contributors
   plugin_minversion = 0.010
-  condition = -e $root . '.git'
-  condition = -e $root . '.git/config'
-  -= include_authors = 1
-  -= include_releaser = 0
-  -= order_by = name
+  += -e $root . '.git'
+  += -e $root . '.git/config'
+  = include_authors = 1
+  = include_releaser = 0
+  = order_by = name
 
 =head1 DESCRIPTION
 

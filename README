@@ -9,11 +9,11 @@ SYNOPSIS
       plugin            = Git::Contributors
       plugin_name       = KNL/Git::Contributors
       plugin_minversion = 0.010
-      condition = -e $root . '.git'
-      condition = -e $root . '.git/config'
-      -= include_authors = 1
-      -= include_releaser = 0
-      -= order_by = name
+      += -e $root . '.git'
+      += -e $root . '.git/config'
+      = include_authors = 1
+      = include_releaser = 0
+      = order_by = name
 
 DESCRIPTION
     "if" is intended to be a similar utility to perl "if".
