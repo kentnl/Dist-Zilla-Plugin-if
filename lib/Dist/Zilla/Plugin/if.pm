@@ -28,93 +28,103 @@ lsub conditions => sub { [] };
 
 lsub plugin_arguments => sub { [] };
 
-lsub prereq_to => sub {[ 'develop.requires' ]};
+lsub prereq_to => sub { ['develop.requires'] };
 
-lsub plugin_package => sub {  my ( $self ) = @_; return Dist::Zilla::Util->expand_config_package_name($self->plugin); };
+lsub plugin_package => sub {
+    my ($self) = @_;
+    return Dist::Zilla::Util->expand_config_package_name( $self->plugin );
+};
 
-sub mvp_aliases { return {
-    '>' => 'plugin_arguments',
-    '?' => 'conditions',
-}};
+sub mvp_aliases {
+    return {
+        '>' => 'plugin_arguments',
+        '?' => 'conditions',
+    };
+}
 sub mvp_multivalue_args { return qw( plugin_arguments prereq_to conditions ) }
 
-my $re_phases = qr/configure|build|test|runtime|develop/msx;
+my $re_phases   = qr/configure|build|test|runtime|develop/msx;
 my $re_relation = qr/requires|recommends|suggests|conflicts/msx;
-my $re_prereq = qr/\A($re_phases)[.]($re_relation)\z/msx;
+my $re_prereq   = qr/\A($re_phases)[.]($re_relation)\z/msx;
 
 sub register_prereqs {
-  my ( $self ) = @_;
-  my $prereqs = $self->zilla->prereqs;
- 
-  my @targets;
+    my ($self) = @_;
+    my $prereqs = $self->zilla->prereqs;
 
-  for my $prereq ( @{ $self->prereq_to }) {
-    if ( my ( $phase, $relation ) = $prereq =~ $re_prereq ) {
-      push @targets, $prereqs->requirements_for( $phase, $relation );
+    my @targets;
+
+    for my $prereq ( @{ $self->prereq_to } ) {
+        if ( my ( $phase, $relation ) = $prereq =~ $re_prereq ) {
+            push @targets, $prereqs->requirements_for( $phase, $relation );
+        }
     }
-  }
-  for my $target ( @targets ){
-    $target->add_string_requirement( $self->plugin_package, $self->plugin_minversion );
-  }
-  return;
+    for my $target (@targets) {
+        $target->add_string_requirement( $self->plugin_package,
+            $self->plugin_minversion );
+    }
+    return;
 }
 
 sub _split_ini_token {
-  my ( $self, $token ) = @_;
-  my ( $key, $value ) = $token =~ /\A\s*([^=]+?)\s*=\s*(.+?)\s*\z/msx;
-  return ( $key, $value );
+    my ( $self, $token ) = @_;
+    my ( $key,  $value ) = $token =~ /\A\s*([^=]+?)\s*=\s*(.+?)\s*\z/msx;
+    return ( $key, $value );
 }
+
 sub check_conditions {
-  my ( $self ) = @_;
+    my ($self) = @_;
 
-  my $env = { };
-  $env->{ q[$root] } = \$self->zilla->root;
-  $env->{ q[$zilla] } = \$self->zilla;
-  my $code = join qq[ and ], @{ $self->conditions };
-  my $closure = eval_closure( 
-      source => qq[sub { \n] . $code . qq[}\n],
-      environment => $env,
-  );
-  return $closure->();
+    my $env = {};
+    $env->{q[$root]}  = \$self->zilla->root;
+    $env->{q[$zilla]} = \$self->zilla;
+    my $code = join qq[ and ], @{ $self->conditions };
+    my $closure = eval_closure(
+        source      => qq[sub { \n] . $code . qq[}\n],
+        environment => $env,
+    );
+    return $closure->();
 }
 
-around 'dump_config' => sub  {
-  my ( $orig,  $self, @args ) = @_;
-  my $config = $self->$orig( @args );
-  my $own_payload = {
-    plugin => $self->plugin,
-    plugin_package => $self->plugin_package,
-    plugin_name => $self->plugin_name,
-    plugin_minversion => $self->plugin_minversion,
-    conditions => $self->conditions,
-    plugin_arguments => $self->plugin_arguments,
-    prereq_to => $self->prereq_to,
-  };
-  $config->{ __PACKAGE__ } = $own_payload;
-  return $config;
+around 'dump_config' => sub {
+    my ( $orig, $self, @args ) = @_;
+    my $config      = $self->$orig(@args);
+    my $own_payload = {
+        plugin            => $self->plugin,
+        plugin_package    => $self->plugin_package,
+        plugin_name       => $self->plugin_name,
+        plugin_minversion => $self->plugin_minversion,
+        conditions        => $self->conditions,
+        plugin_arguments  => $self->plugin_arguments,
+        prereq_to         => $self->prereq_to,
+    };
+    $config->{__PACKAGE__} = $own_payload;
+    return $config;
 };
 
-sub _inject_plugin_section {
-  my ( $self, $if_section ) = @_;
-  my $section_class = $if_section->sequence->assembler->section_class;
-  my $section = $section_class->new(
-    name => $self->plugin_name,
-    package => $self->plugin_package,
-    sequence => $if_section->sequence,
-  );
-  for my $argument ( @{ $self->plugin_arguments } ) {
-    $section->add_value( $self->_split_ini_token( $argument ));
-  }
-  $section->finalize();
-}
-
+# This hooks in if's ->finalize step
+# and conditionally creates a child plugin,
+# which, itself, is finalized, and added to $zilla->plugins
+# prior to this plugin completing finalization.
 around 'plugin_from_config' => sub {
-  my ( $orig, $plugin_class, $name,$arg,$section ) = @_;
-  my $instance = $plugin_class->$orig($name,$arg,$section);
-  if ( $instance->check_conditions ) {
-    $instance->_inject_plugin_section( $section );
-  }
-  return $instance;
+    my ( $orig, $plugin_class, $name, $arg, $if_section ) = @_;
+    my $if_obj = $plugin_class->$orig( $name, $arg, $if_section );
+    
+    return $if_obj unless $if_obj->check_conditions;
+
+    # Here is where we construct the conditional plugin
+    my $child_section = $if_section->sequence->assembler->section_class->new(
+        name     => $if_obj->plugin_name,
+        package  => $if_obj->plugin_package,
+        sequence => $if_section->sequence,
+    );
+    # Here is us, adding the arguments to that plugin
+    for my $argument ( @{ $if_obj->plugin_arguments } ) {
+        $child_section->add_value( $if_obj->_split_ini_token($argument) );
+    }
+    ## And this is where the assembler injects into $zilla->plugins!
+    $child_section->finalize();
+
+    return $if_obj;
 };
 
 __PACKAGE__->meta->make_immutable;
