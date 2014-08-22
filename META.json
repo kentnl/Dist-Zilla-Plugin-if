@@ -796,7 +796,7 @@
             "config" : {
                "__PACKAGE__" : {
                   "conditions" : [
-                     "-e $root . '/.gity'"
+                     "-e $root . '/.git'"
                   ],
                   "plugin" : "Git::Contributors",
                   "plugin_arguments" : [
