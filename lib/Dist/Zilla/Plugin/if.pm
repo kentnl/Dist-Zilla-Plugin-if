@@ -68,7 +68,7 @@ sub check_conditions {
   my $code = qq[];
 
   for my $condition (@{ $self->conditions }){ 
-    $code .= 'return unless (' . $condition . ');' . qq[\n];
+    $code .= $condition . qq[\n];
   }
   $code .= qq[return 1;\n];
   my $closure = eval_closure( 
