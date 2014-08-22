@@ -566,7 +566,7 @@ x_Dist_Zilla:
       config:
         __PACKAGE__:
           conditions:
-            - "-e $root . '/.git'"
+            - "-e $root . '/.gity'"
           plugin: Git::Contributors
           plugin_arguments: []
           plugin_minversion: '0'
