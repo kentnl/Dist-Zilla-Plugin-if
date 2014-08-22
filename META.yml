@@ -566,7 +566,7 @@ x_Dist_Zilla:
       config:
         __PACKAGE__:
           conditions:
-            - "-e $root . '/.gitf'"
+            - "-e $root . '/.git'"
           plugin: Git::Contributors
           plugin_arguments:
             - 'include_author = 1'
