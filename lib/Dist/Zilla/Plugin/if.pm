@@ -59,6 +59,11 @@ sub register_prereqs {
   return;
 }
 
+sub _split_ini_token {
+  my ( $self, $token ) = @_;
+  my ( $key, $value ) = $token =~ /\A\s*([^=]+?)\s*=\s*(.+?)\s*\z/msx;
+  return ( $key, $value );
+}
 sub check_conditions {
   my ( $self ) = @_;
 
@@ -89,11 +94,25 @@ around 'dump_config' => sub  {
   return $config;
 };
 
+sub _inject_plugin_section {
+  my ( $self, $if_section ) = @_;
+  my $section_class = $if_section->sequence->assembler->section_class;
+  my $section = $section_class->new(
+    name => $self->plugin_name,
+    package => $self->plugin_package,
+    sequence => $if_section->sequence,
+  );
+  for my $argument ( @{ $self->plugin_arguments } ) {
+    $section->add_value( $self->_split_ini_token( $argument ));
+  }
+  $section->finalize();
+}
+
 around 'plugin_from_config' => sub {
-  my ( $orig, $plugin_class, @args ) = @_;
-  my $instance = $plugin_class->$orig(@args);
+  my ( $orig, $plugin_class, $name,$arg,$section ) = @_;
+  my $instance = $plugin_class->$orig($name,$arg,$section);
   if ( $instance->check_conditions ) {
-    warn "Conditions are OK :)";
+    $instance->_inject_plugin_section( $section );
   }
   return $instance;
 };
@@ -123,11 +142,11 @@ version 0.001000
   plugin            = Git::Contributors
   plugin_name       = KNL/Git::Contributors
   plugin_minversion = 0.010
-  += -e $root . '.git'
-  += -e $root . '.git/config'
-  = include_authors = 1
-  = include_releaser = 0
-  = order_by = name
+  ?= -e $root . '.git'
+  ?= -e $root . '.git/config'
+  >= include_authors = 1
+  >= include_releaser = 0
+  >= order_by = name
 
 =head1 DESCRIPTION
 

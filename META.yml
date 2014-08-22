@@ -562,6 +562,16 @@ x_Dist_Zilla:
       name: '@Author::KENTNL/::Role::BundleDeps'
       version: '5.020'
     -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          include_authors: '0'
+          include_releaser: '1'
+          order_by: name
+          paths: []
+      name: if
+      version: '0.007'
+    -
       class: Dist::Zilla::Plugin::if
       config:
         __PACKAGE__:
