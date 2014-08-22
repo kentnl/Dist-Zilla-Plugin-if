@@ -33,7 +33,7 @@ lsub prereq_to => sub {[ 'develop.requires' ]};
 lsub plugin_package => sub {  my ( $self ) = @_; return Dist::Zilla::Util->expand_config_package_name($self->plugin); };
 
 sub mvp_aliases { return {
-    '' => 'plugin_arguments',
+    '>' => 'plugin_arguments',
     '+' => 'conditions',
 }};
 sub mvp_multivalue_args { return qw( plugin_arguments prereq_to conditions ) }
