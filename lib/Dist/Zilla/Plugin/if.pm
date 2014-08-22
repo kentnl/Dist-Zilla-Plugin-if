@@ -70,7 +70,7 @@ sub check_conditions {
   for my $condition (@{ $self->conditions }){ 
     $code .= $condition . qq[\n];
   }
-  $code .= qq[return 1;\n];
+  $code .= qq[; return 1;\n];
   my $closure = eval_closure( 
       source => qq[sub { \n] . $code . qq[}\n],
       environment => $env,
