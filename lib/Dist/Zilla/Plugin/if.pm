@@ -1,4 +1,4 @@
-use 5.008;    # utf8
+use 5.010;    #  _Pulp__5010_qr_m_propagate_properly
 use strict;
 use warnings;
 use utf8;
@@ -41,8 +41,8 @@ around 'dump_config' => config_dumper( __PACKAGE__,
 
 sub mvp_aliases {
   return {
-    '>' => 'dz_plugin_arguments',
-    '?' => 'conditions',
+    q{>} => 'dz_plugin_arguments',
+    q{?} => 'conditions',
   };
 }
 
@@ -72,7 +72,7 @@ sub register_prereqs {
 }
 
 sub _split_ini_token {
-  my ( $self, $token ) = @_;
+  my ( undef, $token ) = @_;
   my ( $key,  $value ) = $token =~ /\A\s*([^=]+?)\s*=\s*(.+?)\s*\z/msx;
   return ( $key, $value );
 }
@@ -81,13 +81,15 @@ sub check_conditions {
   my ($self) = @_;
 
   my $env = {};
+  ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
   $env->{q[$root]}  = \$self->zilla->root;
   $env->{q[$zilla]} = \$self->zilla;
-  my $code = join qq[ and ], @{ $self->conditions }, '1';
+  my $code = join q[ and ], @{ $self->conditions }, q[1];
   my $closure = eval_closure(
     source      => qq[sub { \n] . $code . qq[}\n],
     environment => $env,
   );
+  ## use critic;
   return $closure->();
 }
 

@@ -29,7 +29,7 @@ requires:
   Eval::Closure: '0'
   MooX::Lsub: '0'
   Moose: '0'
-  perl: '5.008'
+  perl: '5.010'
   strict: '0'
   utf8: '0'
   warnings: '0'
