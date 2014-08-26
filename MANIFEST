@@ -21,6 +21,7 @@ t/00-report-prereqs.t
 t/env-disable.t
 t/no-plugin.t
 t/pass-args.t
+t/plugin-doublelevel.t
 t/plugin-only-2.t
 t/plugin-only.t
 weaver.ini
