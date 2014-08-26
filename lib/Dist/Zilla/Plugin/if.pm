@@ -104,7 +104,8 @@ around 'plugin_from_config' => sub {
   return $if_obj unless $if_obj->check_conditions;
 
   # Here is where we construct the conditional plugin
-  my $child_section = $if_section->sequence->assembler->section_class->new(
+  my $assembler     = $if_section->sequence->assembler;
+  my $child_section = $assembler->section_class->new(
     name     => $if_obj->dz_plugin_name,
     package  => $if_obj->dz_plugin_package,
     sequence => $if_section->sequence,
