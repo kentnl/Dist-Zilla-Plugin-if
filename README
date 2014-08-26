@@ -6,9 +6,9 @@ VERSION
 
 SYNOPSIS
       [if / FooLoader]
-      plugin            = Git::Contributors
-      plugin_name       = KNL/Git::Contributors
-      plugin_minversion = 0.010
+      dz_plugin            = Git::Contributors
+      dz_plugin_name       = KNL/Git::Contributors
+      dz_plugin_minversion = 0.010
       ?= -e $root . '.git'
       ?= -e $root . '.git/config'
       >= include_authors = 1
