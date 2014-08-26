@@ -28,8 +28,8 @@ for my $wordlist (@stopwords) {
 
 #$bundle->remove_policy('ErrorHandling::RequireUseOfExceptions');
 #$bundle->remove_policy('CodeLayout::RequireUseUTF8');
-#$bundle->remove_policy('ErrorHandling::RequireCarping');
-#$bundle->remove_policy('NamingConventions::Capitalization');
+$bundle->remove_policy('ErrorHandling::RequireCarping');
+$bundle->remove_policy('NamingConventions::Capitalization');
 
 my $inf = $bundle->actionlist->get_inflated;
 
