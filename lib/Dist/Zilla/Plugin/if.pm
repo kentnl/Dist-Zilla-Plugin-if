@@ -381,9 +381,9 @@ as C<develop.requires> ( as per L</prereq_to> ).
 Compiles C<conditions> into a single sub and executes it.
 
   conditions = y and foo
-  conditions = x blah 
+  conditions = x blah
 
-Compiles as 
+Compiles as
 
   sub { y and foo and x blah and 1 }
 
