@@ -459,7 +459,7 @@ For added convenience, this attribute has an alias of '?' ( mnemonic "Test" ), s
 
 =head2 C<dz_plugin_arguments>
 
-A C<mvp_multivalue_arg> attribute that creates an array of arguments 
+A C<mvp_multivalue_arg> attribute that creates an array of arguments
 to pass on to the created plugin.
 
 For convenience, this attribute has an alias of '>' ( mnemonic "Forward" ), so that the following example:
