@@ -21,6 +21,137 @@ DESCRIPTION
     It will execute all of "condition" in turn, and only when all return
     true, will the plugin be added to "Dist::Zilla"
 
+METHODS
+  "register_prereqs"
+    By default, registers "dz_plugin_package" version
+    "dz_plugin_minimumversion" as "develop.requires" ( as per "prereq_to" ).
+
+  check_conditions
+    Compiles "conditions" into a single sub and executes it.
+
+      conditions = y and foo
+      conditions = x blah
+
+    Compiles as
+
+      sub { y and foo and x blah and 1 }
+
+    But with $root and $zilla in scope.
+
+ATTRIBUTES
+  "dz_plugin"
+    REQUIRED
+
+    The "plugin" identifier.
+
+    For instance, "[GatherDir / Foo]" and "[GatherDir]" approximation would
+    both set this field to
+
+      dz_plugin => 'GatherDir'
+
+  "dz_plugin_name"
+    The "Name" for the "plugin".
+
+    For instance, "[GatherDir / Foo]" would set this value as
+
+      dz_plugin_name => "Foo"
+
+    and "[GatherDir]" approximation would both set this field to
+
+      dz_plugin_name => "Foo"
+
+    In Dzil, "[GatherDir]" is equivalent to "[GatherDir / GatherDir]".
+
+    Likewise, if you do not specify "dz_plugin_name", the value of
+    "dz_plugin" will be used.
+
+  "dz_plugin_minversion"
+    The minimum version of "dz_plugin" to use.
+
+    At present, this ONLY affects "prereq" generation.
+
+  "conditions"
+    A "mvp_multivalue_arg" attribute that creates an array of conditions
+    that must all evaluate to true for the "dz_plugin" to be injected.
+
+    These values are internally simply joined with "and" and executed in an
+    "Eval::Closure"
+
+    Two variables are defined in scope for your convenience:
+
+    *   $zilla - The Dist::Zilla builder object itself
+
+    *   $root - The same as "$zilla->root" only more convenient.
+
+    For added convenience, this attribute has an alias of '?' ( nmemonic
+    "Test" ), so the following are equivalent:
+
+      [if]
+      dz_plugin_name = Foo
+      ?= exists $ENV{loadfoo}
+      ?= !!$ENV{loadfoo}
+
+      [if]
+      dz_plugin_name = Foo
+      condition = exists $ENV{loadfoo}
+      condition = !!$ENV{loadfoo}
+
+      [if]
+      dz_plugin_name = Foo
+      conditions = exists $ENV{loadfoo}
+      conditions = !!$ENV{loadfoo}
+
+  "dz_plugin_arguments"
+    A "mvp_multivalue_arg" attribute that creates an array of arguments to
+    pass on to the created plugin.
+
+    For convenience, this attribute has an alias of '>' ( nmenonic "Forward"
+    ), so that the following example:
+
+      [GatherDir]
+      include_dotfiles = 1
+      exclude_file = bad
+      exclude_file = bad2
+
+    Would be written
+
+      [if]
+      dz_plugin = GatherDir
+      ?= $ENV{dogatherdir}
+      >= include_dotfiles = 1
+      >= exclude_file = bad
+      >= exclude_file = bad2
+
+    Or in crazy long form
+
+      [if]
+      dz_plugin = GatherDir
+      condtion = $ENV{dogatherdir}
+      dz_plugin_argument = include_dotfiles = 1
+      dz_plugin_argument = exclude_file = bad
+      dz_plugin_argument = exclude_file = bad2
+
+  "prereq_to"
+    This determines where dependencies get injected.
+
+    Default is:
+
+      develop.requires
+
+    And a special value
+
+      none
+
+    Prevents dependency injection.
+
+    This attribute may be specified multiple times.
+
+  "dz_plugin_package"
+    This is an implementation detail which returns the expanded name of
+    "dz_plugin"
+
+    You could probably find some evil use for this, but I doubt it.
+
 AUTHOR
     Kent Fredric <kentfredric@gmail.com>
 
