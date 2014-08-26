@@ -172,6 +172,18 @@ lsub dz_plugin_package => sub {
 around 'dump_config' => config_dumper( __PACKAGE__,
   qw( dz_plugin dz_plugin_name dz_plugin_package dz_plugin_minversion conditions dz_plugin_arguments prereq_to ) );
 
+
+
+
+
+
+
+
+
+
+
+
+
 sub mvp_aliases {
   return {
     q{>}                  => 'dz_plugin_arguments',
@@ -180,6 +192,22 @@ sub mvp_aliases {
     q[condition]          => 'conditions',
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub mvp_multivalue_args {
   return qw( dz_plugin_arguments prereq_to conditions );
@@ -319,6 +347,30 @@ be added to C<Dist::Zilla>
 
 =head1 METHODS
 
+=head2 C<mvp_aliases>
+
+=over 4
+
+=item * C<dz_plugin_arguments=> can be written as C<< >= >> or C<< dz_plugin_argument= >>
+
+=item * C<conditions=> can be written as C<< ?= >> or C<< condition= >>
+
+=back
+
+=head2 C<mvp_multivalue_args>
+
+All of the following support multiple declaration:
+
+=over 4
+
+=item * C<dz_plugin_arguments>
+
+=item * C<prereq_to>
+
+=item * C<conditions>
+
+=back
+
 =head2 C<register_prereqs>
 
 By default, registers L</dz_plugin_package> version L</dz_plugin_minimumversion>
@@ -361,7 +413,7 @@ and C<[GatherDir]> approximation would both set this field to
 
   dz_plugin_name => "Foo"
 
-In Dzil, C<[GatherDir]> is equivalent to C<[GatherDir / GatherDir]>.
+In C<Dist::Zilla>, C<[GatherDir]> is equivalent to C<[GatherDir / GatherDir]>.
 
 Likewise, if you do not specify C<dz_plugin_name>, the value of C<dz_plugin> will be used.
 
@@ -388,7 +440,7 @@ Two variables are defined in scope for your convenience:
 
 =back
 
-For added convenience, this attribute has an alias of '?' ( nmemonic "Test" ), so the following are equivalent:
+For added convenience, this attribute has an alias of '?' ( mnemonic "Test" ), so the following are equivalent:
 
   [if]
   dz_plugin_name = Foo
@@ -410,7 +462,7 @@ For added convenience, this attribute has an alias of '?' ( nmemonic "Test" ), s
 A C<mvp_multivalue_arg> attribute that creates an array of arguments 
 to pass on to the created plugin.
 
-For convenience, this attribute has an alias of '>' ( nmenonic "Forward" ), so that the following example:
+For convenience, this attribute has an alias of '>' ( mnemonic "Forward" ), so that the following example:
 
   [GatherDir]
   include_dotfiles = 1

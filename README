@@ -22,6 +22,21 @@ DESCRIPTION
     true, will the plugin be added to "Dist::Zilla"
 
 METHODS
+  "mvp_aliases"
+    *   "dz_plugin_arguments=" can be written as ">=" or
+        "dz_plugin_argument="
+
+    *   "conditions=" can be written as "?=" or "condition="
+
+  "mvp_multivalue_args"
+    All of the following support multiple declaration:
+
+    *   "dz_plugin_arguments"
+
+    *   "prereq_to"
+
+    *   "conditions"
+
   "register_prereqs"
     By default, registers "dz_plugin_package" version
     "dz_plugin_minimumversion" as "develop.requires" ( as per "prereq_to" ).
@@ -60,7 +75,8 @@ ATTRIBUTES
 
       dz_plugin_name => "Foo"
 
-    In Dzil, "[GatherDir]" is equivalent to "[GatherDir / GatherDir]".
+    In "Dist::Zilla", "[GatherDir]" is equivalent to "[GatherDir /
+    GatherDir]".
 
     Likewise, if you do not specify "dz_plugin_name", the value of
     "dz_plugin" will be used.
@@ -83,7 +99,7 @@ ATTRIBUTES
 
     *   $root - The same as "$zilla->root" only more convenient.
 
-    For added convenience, this attribute has an alias of '?' ( nmemonic
+    For added convenience, this attribute has an alias of '?' ( mnemonic
     "Test" ), so the following are equivalent:
 
       [if]
@@ -105,7 +121,7 @@ ATTRIBUTES
     A "mvp_multivalue_arg" attribute that creates an array of arguments to
     pass on to the created plugin.
 
-    For convenience, this attribute has an alias of '>' ( nmenonic "Forward"
+    For convenience, this attribute has an alias of '>' ( mnemonic "Forward"
     ), so that the following example:
 
       [GatherDir]
