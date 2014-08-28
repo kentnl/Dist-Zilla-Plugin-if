@@ -1,6 +1,9 @@
 Release history for Dist-Zilla-Plugin-if
 
 0.001001 2014-08-26T08:21:48Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - runtime: +1 -1
 
 0.001000 2014-08-26T07:55:43Z
  - First version.
