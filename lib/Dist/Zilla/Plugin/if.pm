@@ -37,6 +37,8 @@ around mvp_multivalue_args => sub {
   return ( qw( conditions ), $self->$orig(@args) );
 };
 
+lsub conditions => sub { [] };
+
 sub check_conditions {
   my ($self) = @_;
 
@@ -63,95 +65,6 @@ __PACKAGE__->meta->make_immutable;
 no Moose;
 
 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-lsub conditions => sub { [] };
 
 __END__
 
