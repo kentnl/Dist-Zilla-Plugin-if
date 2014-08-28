@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dist::Zilla::Plugin::if",
   "PREREQ_PM" => {
-    "Dist::Zilla::Role::PrereqSource" => 0,
+    "Dist::Zilla::Role::PluginLoader::Configurable" => 0,
     "Dist::Zilla::Util" => 0,
     "Dist::Zilla::Util::ConfigDumper" => 0,
     "Eval::Closure" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Dist::Zilla::Role::PrereqSource" => 0,
+  "Dist::Zilla::Role::PluginLoader::Configurable" => 0,
   "Dist::Zilla::Util" => 0,
   "Dist::Zilla::Util::ConfigDumper" => 0,
   "Dist::Zilla::Util::Test::KENTNL" => "1.001",
