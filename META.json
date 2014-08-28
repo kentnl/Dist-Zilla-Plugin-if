@@ -112,11 +112,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::if" : {
          "file" : "lib/Dist/Zilla/Plugin/if.pm",
-         "version" : "0.002000"
+         "version" : "0.002001"
       },
       "Dist::Zilla::Plugin::if::not" : {
          "file" : "lib/Dist/Zilla/Plugin/if/not.pm",
-         "version" : "0.002000"
+         "version" : "0.002001"
       }
    },
    "release_status" : "stable",
@@ -131,7 +131,7 @@
          "web" : "https://github.com/kentnl/Dist-Zilla-Plugin-if"
       }
    },
-   "version" : "0.002000",
+   "version" : "0.002001",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.142060",
@@ -654,7 +654,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : null,
                   "signed" : 0,
-                  "tag" : "0.002000-source",
+                  "tag" : "0.002001-source",
                   "tag_format" : "%v-source",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
@@ -725,7 +725,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : "releases",
                   "signed" : 0,
-                  "tag" : "0.002000",
+                  "tag" : "0.002001",
                   "tag_format" : "%v",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
