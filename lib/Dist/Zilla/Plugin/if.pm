@@ -5,263 +5,39 @@ use utf8;
 
 package Dist::Zilla::Plugin::if;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.002000';
 
 # ABSTRACT: Load a plugin only if a condition is true
 
 our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 
 use Moose qw( has around with );
-use MooX::Lsub qw( lsub );
 use Dist::Zilla::Util qw();
 use Eval::Closure qw( eval_closure );
 use Dist::Zilla::Util::ConfigDumper qw( config_dumper );
 
-with 'Dist::Zilla::Role::PrereqSource';
-
-
-
-
-
-
-
-
-
-
-
-
-
-has dz_plugin => ( is => ro =>, required => 1 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-lsub dz_plugin_name => sub { my ($self) = @_; return $self->dz_plugin; };
-
-
-
-
-
-
-
-
-
-lsub dz_plugin_minversion => sub { return 0 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-lsub conditions => sub { [] };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-lsub dz_plugin_arguments => sub { [] };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-lsub prereq_to => sub { ['develop.requires'] };
-
-
-
-
-
-
-
-
-
-lsub dz_plugin_package => sub {
-  my ($self) = @_;
-  return Dist::Zilla::Util->expand_config_package_name( $self->dz_plugin );
+with 'Dist::Zilla::Role::PluginLoader::Configurable';
+
+around 'dump_config' => config_dumper( __PACKAGE__, qw( conditions ) );
+
+around mvp_aliases => sub {
+  my ( $orig, $self, @rest ) = @_;
+  my $hash = $self->$orig(@rest);
+  $hash = {
+    %{$hash},
+    q{?}         => 'conditions',
+    q[condition] => 'conditions',
+  };
+  return $hash;
 };
 
-around 'dump_config' => config_dumper( __PACKAGE__,
-  qw( dz_plugin dz_plugin_name dz_plugin_package dz_plugin_minversion conditions dz_plugin_arguments prereq_to ) );
+around mvp_multivalue_args => sub {
+  my ( $orig, $self, @args ) = @_;
+  return ( qw( conditions ), $self->$orig(@args) );
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-sub mvp_aliases {
-  return {
-    q{>}                  => 'dz_plugin_arguments',
-    q[dz_plugin_argument] => 'dz_plugin_arguments',
-    q{?}                  => 'conditions',
-    q[condition]          => 'conditions',
-  };
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-sub mvp_multivalue_args {
-  return qw( dz_plugin_arguments prereq_to conditions );
-}
-
-my $re_phases   = qr/configure|build|test|runtime|develop/msx;
-my $re_relation = qr/requires|recommends|suggests|conflicts/msx;
-my $re_prereq   = qr/\A($re_phases)[.]($re_relation)\z/msx;
-
-
-
-
-
-
-
-
-sub register_prereqs {
-  my ($self) = @_;
-  my $prereqs = $self->zilla->prereqs;
-
-  my @targets;
-
-  for my $prereq ( @{ $self->prereq_to } ) {
-    next if 'none' eq $prereq;
-    if ( my ( $phase, $relation ) = $prereq =~ $re_prereq ) {
-      push @targets, $prereqs->requirements_for( $phase, $relation );
-    }
-  }
-  for my $target (@targets) {
-    $target->add_string_requirement( $self->dz_plugin_package, $self->dz_plugin_minversion );
-  }
-  return;
-}
-
-sub _split_ini_token {
-  my ( undef, $token ) = @_;
-  my ( $key,  $value ) = $token =~ /\A\s*([^=]+?)\s*=\s*(.+?)\s*\z/msx;
-  return ( $key, $value );
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+has conditions => ( is => 'ro', lazy_build => 1 );
+sub _build_conditions { return [] }
 
 sub check_conditions {
   my ($self) = @_;
@@ -279,32 +55,10 @@ sub check_conditions {
   return $closure->();
 }
 
-# This hooks in if's ->finalize step
-# and conditionally creates a child plugin,
-# which, itself, is finalized, and added to $zilla->plugins
-# prior to this plugin completing finalization.
-around 'plugin_from_config' => sub {
-  my ( $orig, $plugin_class, $name, $arg, $if_section ) = @_;
-  my $if_obj = $plugin_class->$orig( $name, $arg, $if_section );
-
-  return $if_obj unless $if_obj->check_conditions;
-
-  # Here is where we construct the conditional plugin
-  my $assembler     = $if_section->sequence->assembler;
-  my $child_section = $assembler->section_class->new(
-    name     => $if_obj->dz_plugin_name,
-    package  => $if_obj->dz_plugin_package,
-    sequence => $if_section->sequence,
-  );
-
-  # Here is us, adding the arguments to that plugin
-  for my $argument ( @{ $if_obj->dz_plugin_arguments } ) {
-    $child_section->add_value( $if_obj->_split_ini_token($argument) );
-  }
-  ## And this is where the assembler injects into $zilla->plugins!
-  $child_section->finalize();
-
-  return $if_obj;
+around 'load_plugins' => sub {
+  my ( $orig, $self, $loader ) = @_;
+  return unless $self->check_conditions;
+  return $self->$orig($loader);
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -324,7 +78,7 @@ Dist::Zilla::Plugin::if - Load a plugin only if a condition is true
 
 =head1 VERSION
 
-version 0.001000
+version 0.002000
 
 =head1 SYNOPSIS
 

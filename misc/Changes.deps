@@ -1,0 +1,10 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002000
+ [Added / runtime requires]
+ - Dist::Zilla::Role::PluginLoader::Configurable
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Role::PrereqSource
+ - MooX::Lsub
+

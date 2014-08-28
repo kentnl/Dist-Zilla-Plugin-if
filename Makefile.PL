@@ -20,11 +20,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dist::Zilla::Plugin::if",
   "PREREQ_PM" => {
-    "Dist::Zilla::Role::PrereqSource" => 0,
+    "Dist::Zilla::Role::PluginLoader::Configurable" => 0,
     "Dist::Zilla::Util" => 0,
     "Dist::Zilla::Util::ConfigDumper" => 0,
     "Eval::Closure" => 0,
-    "MooX::Lsub" => 0,
     "Moose" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -38,22 +37,21 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.001000",
+  "VERSION" => "0.002000",
   "test" => {
-    "TESTS" => "t/*.t t/00-compile/*.t"
+    "TESTS" => "t/*.t t/00-compile/*.t t/if/*.t t/ifnot/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "Dist::Zilla::Role::PrereqSource" => 0,
+  "Dist::Zilla::Role::PluginLoader::Configurable" => 0,
   "Dist::Zilla::Util" => 0,
   "Dist::Zilla::Util::ConfigDumper" => 0,
   "Dist::Zilla::Util::Test::KENTNL" => "1.001",
   "Eval::Closure" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "MooX::Lsub" => 0,
   "Moose" => 0,
   "Test::DZil" => 0,
   "Test::Differences" => 0,
