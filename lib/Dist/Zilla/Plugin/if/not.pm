@@ -12,14 +12,14 @@ our $VERSION = '0.001001';
 our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 
 use Moose qw( has around with );
-use MooX::Lsub qw( lsub );
 use Dist::Zilla::Util qw();
 use Eval::Closure qw( eval_closure );
 use Dist::Zilla::Util::ConfigDumper qw( config_dumper );
 
 with 'Dist::Zilla::Role::PluginLoader::Configurable';
 
-lsub conditions => sub { [] };
+has conditions => ( is => ro => lazy_build => 1 );
+sub _build_conditions { return [] };
 
 around 'dump_config' => config_dumper( __PACKAGE__, qw( conditions ) );
 
