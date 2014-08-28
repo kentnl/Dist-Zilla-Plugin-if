@@ -36,8 +36,8 @@ around mvp_multivalue_args => sub {
   return ( qw( conditions ), $self->$orig(@args) );
 };
 
-has conditions => ( is => ro => lazy_build => 1 );
-sub _build_conditions { return [] };
+has conditions => ( is => 'ro', lazy_build => 1 );
+sub _build_conditions { return [] }
 
 sub check_conditions {
   my ($self) = @_;

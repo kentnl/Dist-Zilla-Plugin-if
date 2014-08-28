@@ -18,8 +18,8 @@ use Dist::Zilla::Util::ConfigDumper qw( config_dumper );
 
 with 'Dist::Zilla::Role::PluginLoader::Configurable';
 
-has conditions => ( is => ro => lazy_build => 1 );
-sub _build_conditions { return [] };
+has conditions => ( is => 'ro', lazy_build => 1 );
+sub _build_conditions { return [] }
 
 around 'dump_config' => config_dumper( __PACKAGE__, qw( conditions ) );
 
