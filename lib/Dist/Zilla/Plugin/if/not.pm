@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::if::not;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.002000';
 
 # ABSTRACT: Only load a plugin if a condition is false
 
@@ -85,7 +85,7 @@ Dist::Zilla::Plugin::if::not - Only load a plugin if a condition is false
 
 =head1 VERSION
 
-version 0.001001
+version 0.002000
 
 =head1 METHODS
 
