@@ -5,6 +5,8 @@ use utf8;
 
 package Dist::Zilla::Plugin::if::not;
 
+our $VERSION = '0.001001';
+
 # ABSTRACT: Only load a plugin if a condition is false
 
 our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
