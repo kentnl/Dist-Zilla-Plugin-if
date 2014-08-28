@@ -38,6 +38,13 @@ around mvp_multivalue_args => sub {
   return ( qw( conditions ), $self->$orig(@args) );
 };
 
+
+
+
+
+
+
+
 sub check_conditions {
   my ($self) = @_;
 
@@ -51,12 +58,12 @@ sub check_conditions {
     environment => $env,
   );
   ## use critic;
-  return $closure->();
+  return !$closure->();
 }
 
 around 'load_plugins' => sub {
   my ( $orig, $self, $loader ) = @_;
-  return if $self->check_conditions;
+  return unless $self->check_conditions;
   return $self->$orig($loader);
 };
 
@@ -79,6 +86,13 @@ Dist::Zilla::Plugin::if::not - Only load a plugin if a condition is false
 =head1 VERSION
 
 version 0.001001
+
+=head1 METHODS
+
+=head2 C<check_conditions>
+
+This is identical to L<< C<if>|Dist::Zilla::Plugin::if >> except this condition
+returns inverted.
 
 =head1 AUTHOR
 
