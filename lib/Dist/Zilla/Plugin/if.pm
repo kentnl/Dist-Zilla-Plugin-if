@@ -12,12 +12,78 @@ our $VERSION = '0.001001';
 # AUTHORITY
 
 use Moose qw( has around with );
-use MooX::Lsub qw( lsub );
 use Dist::Zilla::Util qw();
 use Eval::Closure qw( eval_closure );
 use Dist::Zilla::Util::ConfigDumper qw( config_dumper );
 
-with 'Dist::Zilla::Role::PrereqSource';
+with 'Dist::Zilla::Role::PluginLoader::Configurable';
+
+around 'dump_config' => config_dumper( __PACKAGE__, qw( conditions ) );
+
+around mvp_aliases => sub {
+  my ( $orig, $self, @rest ) = @_;
+  my $hash = $self->$orig(@rest);
+  $hash = {
+    %{$hash},
+    q{?}         => 'conditions',
+    q[condition] => 'conditions',
+  };
+  return $hash;
+};
+
+around mvp_multivalue_args => sub {
+  my ( $orig, $self, @args ) = @_;
+  return ( qw( conditions ), $self->$orig(@args) );
+};
+
+has conditions => ( is => 'ro', lazy_build => 1 );
+sub _build_conditions { return [] }
+
+sub check_conditions {
+  my ($self) = @_;
+
+  my $env = {};
+  ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+  $env->{q[$root]}  = \$self->zilla->root;
+  $env->{q[$zilla]} = \$self->zilla;
+  my $code = join q[ and ], @{ $self->conditions }, q[1];
+  my $closure = eval_closure(
+    source      => qq[sub { \n] . $code . qq[}\n],
+    environment => $env,
+  );
+  ## use critic;
+  return $closure->();
+}
+
+around 'load_plugins' => sub {
+  my ( $orig, $self, $loader ) = @_;
+  return unless $self->check_conditions;
+  return $self->$orig($loader);
+};
+
+__PACKAGE__->meta->make_immutable;
+no Moose;
+
+1;
+
+=head1 SYNOPSIS
+
+  [if / FooLoader]
+  dz_plugin            = Git::Contributors
+  dz_plugin_name       = KNL/Git::Contributors
+  dz_plugin_minversion = 0.010
+  ?= -e $root . '.git'
+  ?= -e $root . '.git/config'
+  >= include_authors = 1
+  >= include_releaser = 0
+  >= order_by = name
+
+=head1 DESCRIPTION
+
+C<if> is intended to be a similar utility to L<< perl C<if>|if >>.
+
+It will execute all of C<condition> in turn, and only when all return true, will the plugin
+be added to C<Dist::Zilla>
 
 =attr C<dz_plugin>
 
@@ -28,10 +94,6 @@ The C<plugin> identifier.
 For instance, C<[GatherDir / Foo]> and C<[GatherDir]> approximation would both set this field to
 
   dz_plugin => 'GatherDir'
-
-=cut
-
-has dz_plugin => ( is => ro =>, required => 1 );
 
 =attr C<dz_plugin_name>
 
@@ -49,19 +111,11 @@ In C<Dist::Zilla>, C<[GatherDir]> is equivalent to C<[GatherDir / GatherDir]>.
 
 Likewise, if you do not specify C<dz_plugin_name>, the value of C<dz_plugin> will be used.
 
-=cut
-
-lsub dz_plugin_name => sub { my ($self) = @_; return $self->dz_plugin; };
-
 =attr C<dz_plugin_minversion>
 
 The minimum version of C<dz_plugin> to use.
 
 At present, this B<ONLY> affects C<prereq> generation.
-
-=cut
-
-lsub dz_plugin_minversion => sub { return 0 };
 
 =attr C<conditions>
 
@@ -97,10 +151,6 @@ For added convenience, this attribute has an alias of '?' ( mnemonic "Test" ), s
   conditions = exists $ENV{loadfoo}
   conditions = !!$ENV{loadfoo}
 
-=cut
-
-lsub conditions => sub { [] };
-
 =attr C<dz_plugin_arguments>
 
 A C<mvp_multivalue_arg> attribute that creates an array of arguments
@@ -131,10 +181,6 @@ Or in crazy long form
   dz_plugin_argument = exclude_file = bad
   dz_plugin_argument = exclude_file = bad2
 
-=cut
-
-lsub dz_plugin_arguments => sub { [] };
-
 =attr C<prereq_to>
 
 This determines where dependencies get injected.
@@ -151,26 +197,11 @@ Prevents dependency injection.
 
 This attribute may be specified multiple times.
 
-
-=cut
-
-lsub prereq_to => sub { ['develop.requires'] };
-
 =attr C<dz_plugin_package>
 
 This is an implementation detail which returns the expanded name of C<dz_plugin>
 
 You could probably find some evil use for this, but I doubt it.
-
-=cut
-
-lsub dz_plugin_package => sub {
-  my ($self) = @_;
-  return Dist::Zilla::Util->expand_config_package_name( $self->dz_plugin );
-};
-
-around 'dump_config' => config_dumper( __PACKAGE__,
-  qw( dz_plugin dz_plugin_name dz_plugin_package dz_plugin_minversion conditions dz_plugin_arguments prereq_to ) );
 
 =method C<mvp_aliases>
 
@@ -181,17 +212,6 @@ around 'dump_config' => config_dumper( __PACKAGE__,
 =item * C<conditions=> can be written as C<< ?= >> or C<< condition= >>
 
 =back
-
-=cut
-
-sub mvp_aliases {
-  return {
-    q{>}                  => 'dz_plugin_arguments',
-    q[dz_plugin_argument] => 'dz_plugin_arguments',
-    q{?}                  => 'conditions',
-    q[condition]          => 'conditions',
-  };
-}
 
 =method C<mvp_multivalue_args>
 
@@ -207,46 +227,10 @@ All of the following support multiple declaration:
 
 =back
 
-=cut
-
-sub mvp_multivalue_args {
-  return qw( dz_plugin_arguments prereq_to conditions );
-}
-
-my $re_phases   = qr/configure|build|test|runtime|develop/msx;
-my $re_relation = qr/requires|recommends|suggests|conflicts/msx;
-my $re_prereq   = qr/\A($re_phases)[.]($re_relation)\z/msx;
-
 =method C<register_prereqs>
 
 By default, registers L</dz_plugin_package> version L</dz_plugin_minimumversion>
 as C<develop.requires> ( as per L</prereq_to> ).
-
-=cut
-
-sub register_prereqs {
-  my ($self) = @_;
-  my $prereqs = $self->zilla->prereqs;
-
-  my @targets;
-
-  for my $prereq ( @{ $self->prereq_to } ) {
-    next if 'none' eq $prereq;
-    if ( my ( $phase, $relation ) = $prereq =~ $re_prereq ) {
-      push @targets, $prereqs->requirements_for( $phase, $relation );
-    }
-  }
-  for my $target (@targets) {
-    $target->add_string_requirement( $self->dz_plugin_package, $self->dz_plugin_minversion );
-  }
-  return;
-}
-
-sub _split_ini_token {
-  my ( undef, $token ) = @_;
-  my ( $key,  $value ) = $token =~ /\A\s*([^=]+?)\s*=\s*(.+?)\s*\z/msx;
-  return ( $key, $value );
-}
 
 =method check_conditions
 
@@ -263,72 +247,3 @@ But with C<$root> and C<$zilla> in scope.
 
 =cut
 
-sub check_conditions {
-  my ($self) = @_;
-
-  my $env = {};
-  ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-  $env->{q[$root]}  = \$self->zilla->root;
-  $env->{q[$zilla]} = \$self->zilla;
-  my $code = join q[ and ], @{ $self->conditions }, q[1];
-  my $closure = eval_closure(
-    source      => qq[sub { \n] . $code . qq[}\n],
-    environment => $env,
-  );
-  ## use critic;
-  return $closure->();
-}
-
-# This hooks in if's ->finalize step
-# and conditionally creates a child plugin,
-# which, itself, is finalized, and added to $zilla->plugins
-# prior to this plugin completing finalization.
-around 'plugin_from_config' => sub {
-  my ( $orig, $plugin_class, $name, $arg, $if_section ) = @_;
-  my $if_obj = $plugin_class->$orig( $name, $arg, $if_section );
-
-  return $if_obj unless $if_obj->check_conditions;
-
-  # Here is where we construct the conditional plugin
-  my $assembler     = $if_section->sequence->assembler;
-  my $child_section = $assembler->section_class->new(
-    name     => $if_obj->dz_plugin_name,
-    package  => $if_obj->dz_plugin_package,
-    sequence => $if_section->sequence,
-  );
-
-  # Here is us, adding the arguments to that plugin
-  for my $argument ( @{ $if_obj->dz_plugin_arguments } ) {
-    $child_section->add_value( $if_obj->_split_ini_token($argument) );
-  }
-  ## And this is where the assembler injects into $zilla->plugins!
-  $child_section->finalize();
-
-  return $if_obj;
-};
-
-__PACKAGE__->meta->make_immutable;
-no Moose;
-
-1;
-
-=head1 SYNOPSIS
-
-  [if / FooLoader]
-  dz_plugin            = Git::Contributors
-  dz_plugin_name       = KNL/Git::Contributors
-  dz_plugin_minversion = 0.010
-  ?= -e $root . '.git'
-  ?= -e $root . '.git/config'
-  >= include_authors = 1
-  >= include_releaser = 0
-  >= order_by = name
-
-=head1 DESCRIPTION
-
-C<if> is intended to be a similar utility to L<< perl C<if>|if >>.
-
-It will execute all of C<condition> in turn, and only when all return true, will the plugin
-be added to C<Dist::Zilla>
-
-=cut

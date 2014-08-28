@@ -1,6 +1,13 @@
 Release history for Dist-Zilla-Plugin-if
 
 {{$NEXT}}
+ [00 Minor]
+ - Rewrite internals in terms of Role::PluginLoader
+ - Add if::not
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - runtime: +1 -2
 
 0.001000 2014-08-26T07:55:43Z
  - First version.
