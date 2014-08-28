@@ -1,6 +1,8 @@
 This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
 
-0.002000
+0.002001
+
+0.002000 2014-08-28T01:45:46Z
  [Added / runtime requires]
  - Dist::Zilla::Role::PluginLoader::Configurable
 
