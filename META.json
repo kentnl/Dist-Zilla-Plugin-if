@@ -100,7 +100,7 @@
             "Test::More" : "1.001003"
          },
          "requires" : {
-            "Dist::Zilla::Util::Test::KENTNL" : "1.001",
+            "Dist::Zilla::Util::Test::KENTNL" : "1.003001",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test::DZil" : "0",
@@ -184,7 +184,7 @@
          "Dist::Zilla::Role::PluginLoader::Configurable" : "0.001000",
          "Dist::Zilla::Util" : "5.020",
          "Dist::Zilla::Util::ConfigDumper" : "0.003001",
-         "Dist::Zilla::Util::Test::KENTNL" : "1.002000",
+         "Dist::Zilla::Util::Test::KENTNL" : "1.003001",
          "Eval::Closure" : "0.11",
          "ExtUtils::MakeMaker" : "6.98",
          "File::Spec" : "3.49",
@@ -808,7 +808,7 @@
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "runtime",
+                  "phase" : "test",
                   "type" : "requires"
                }
             },
