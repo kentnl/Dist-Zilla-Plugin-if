@@ -2,7 +2,7 @@ NAME
     Dist::Zilla::Plugin::if - Load a plugin only if a condition is true
 
 VERSION
-    version 0.002001
+    version 0.002002
 
 SYNOPSIS
       [if / FooLoader]
