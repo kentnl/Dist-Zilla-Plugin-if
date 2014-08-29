@@ -1,6 +1,12 @@
 Release history for Dist-Zilla-Plugin-if
 
 {{$NEXT}}
+ [Bugfix]
+ - Avoid no-build-dir fails.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - test: ↑1
 
 0.002000 2014-08-28T01:45:46Z
  [00 Minor]
