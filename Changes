@@ -1,5 +1,13 @@
 Release history for Dist-Zilla-Plugin-if
 
+0.002001 2014-08-29T09:56:30Z
+ [Bugfix]
+ - Avoid no-build-dir fails.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - test: ↑1
+
 0.002000 2014-08-28T01:45:46Z
  [00 Minor]
  - Rewrite internals in terms of Role::PluginLoader

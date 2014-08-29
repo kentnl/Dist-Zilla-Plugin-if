@@ -30,14 +30,14 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Dist::Zilla::Util::Test::KENTNL" => "1.001",
+    "Dist::Zilla::Util::Test::KENTNL" => "1.003001",
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::DZil" => 0,
     "Test::Differences" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.002000",
+  "VERSION" => "0.002001",
   "test" => {
     "TESTS" => "t/*.t t/00-compile/*.t t/if/*.t t/ifnot/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::PluginLoader::Configurable" => 0,
   "Dist::Zilla::Util" => 0,
   "Dist::Zilla::Util::ConfigDumper" => 0,
-  "Dist::Zilla::Util::Test::KENTNL" => "1.001",
+  "Dist::Zilla::Util::Test::KENTNL" => "1.003001",
   "Eval::Closure" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
