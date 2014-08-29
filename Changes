@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-if
 
 {{$NEXT}}
+
+0.002001 2014-08-29T09:56:30Z
  [Bugfix]
  - Avoid no-build-dir fails.
 
