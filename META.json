@@ -117,7 +117,6 @@
             "Test::More" : "0.99"
          },
          "requires" : {
-            "Dist::Zilla::Util::Test::KENTNL" : "1.003001",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test::DZil" : "0",
@@ -842,17 +841,6 @@
                }
             },
             "name" : "@Author::KENTNL/::Role::BundleDeps",
-            "version" : "6.009"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "test",
-                  "type" : "requires"
-               }
-            },
-            "name" : "Prereqs",
             "version" : "6.009"
          },
          {
