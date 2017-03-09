@@ -14,14 +14,24 @@ our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 use Moose qw( has around with );
 use Dist::Zilla::Util qw();
 use Eval::Closure qw( eval_closure );
-use Dist::Zilla::Util::ConfigDumper qw( config_dumper );
 
 with 'Dist::Zilla::Role::PluginLoader::Configurable';
 
 has conditions => ( is => 'ro', lazy_build => 1 );
 sub _build_conditions { return [] }
 
-around 'dump_config' => config_dumper( __PACKAGE__, qw( conditions ) );
+around dump_config => sub {
+  my ( $orig, $self, @args ) = @_;
+  my $config = $self->$orig(@args);
+  my $localconf = $config->{ +__PACKAGE__ } = {};
+
+  $localconf->{conditions} = $self->conditions;
+
+  $localconf->{ q[$] . __PACKAGE__ . '::VERSION' } = $VERSION
+    unless __PACKAGE__ eq ref $self;
+
+  return $config;
+};
 
 around mvp_aliases => sub {
   my ( $orig, $self, @rest ) = @_;
