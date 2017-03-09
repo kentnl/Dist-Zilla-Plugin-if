@@ -1,5 +1,7 @@
 Release history for Dist-Zilla-Plugin-if
 
+0.002003 2017-03-09T10:12:17Z 325d6f7
+
 0.002002 2017-03-09T10:10:27Z b99280b
  - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
  - Remove use of ConfigDumper util

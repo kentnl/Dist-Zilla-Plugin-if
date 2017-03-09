@@ -22,10 +22,10 @@ name: Dist-Zilla-Plugin-if
 provides:
   Dist::Zilla::Plugin::if:
     file: lib/Dist/Zilla/Plugin/if.pm
-    version: '0.002002'
+    version: '0.002003'
   Dist::Zilla::Plugin::if::not:
     file: lib/Dist/Zilla/Plugin/if/not.pm
-    version: '0.002002'
+    version: '0.002003'
 recommends:
   Moose: '2.000'
 requires:
@@ -41,4 +41,4 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-if/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-if
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-if.git
-version: '0.002002'
+version: '0.002003'
