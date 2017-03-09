@@ -2,23 +2,18 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 5;
 
 # ABSTRACT: A basic test
 
-use Test::DZil qw( simple_ini );
-use Dist::Zilla::Util::Test::KENTNL 1.001 qw( dztest );
+use Test::DZil qw( simple_ini Builder );
 use Test::Differences;
-
-my $t = dztest();
-$t->add_file( '.dotfile', q[adotfile] );
-$t->add_file( 'bad1',     q[abadfile] );
-$t->add_file( 'bad2',     q[abadfile] );
-$t->add_file( 'good',     q[agoodfile] );
-
-$t->add_file(
-  'dist.ini',
-  simple_ini(
+my $files = {
+  'source/.dotfile' => q[adotfile],
+  'source/bad1'     => q[abadfile],
+  'source/bad2'     => q[abadfile],
+  'source/good'     => q[agoodfile],
+  'source/dist.ini' => simple_ini(
     ['MetaConfig'],
     [
       'if::not' => {
@@ -27,20 +22,24 @@ $t->add_file(
         dz_plugin_arguments =>
           [ 'include_dotfiles = 1', 'exclude_filename = bad1', 'exclude_filename = bad2', 'exclude_filename = bad 3', ]
       }
-    ],
+    ]
   )
-);
-$t->build_ok;
+};
 
-$t->meta_path_deeply(
-  '/x_Dist_Zilla/plugins/*[ value->{class} !~ /Dist::Zilla::Plugin::FinderCode/ ]/*[key eq q[class]]',
+my $zilla = Builder->from_config( { dist_root => 'invalid' }, { add_files => $files } );
+$zilla->chrome->logger->set_debug(1);
+$zilla->build;
+
+is_deeply(
+  [
+    map { $_->{class} } grep { $_->{class} ne 'Dist::Zilla::Plugin::FinderCode' } @{ $zilla->distmeta->{x_Dist_Zilla}->{plugins} }
+  ],
   [ 'Dist::Zilla::Plugin::MetaConfig', 'Dist::Zilla::Plugin::GatherDir', 'Dist::Zilla::Plugin::if::not', ],
+  "Expected plugins",
 );
-my $plugin = $t->builder->plugin_named('GatherDir');
+my $plugin = $zilla->plugin_named('GatherDir');
 
 eq_or_diff( $plugin->exclude_filename, [ 'bad1', 'bad2', 'bad 3' ] );
-
-$t->test_has_built_file('dist.ini');
-$t->test_has_built_file('.dotfile');
-$t->test_has_built_file('good');
-done_testing;
+ok( -e ( $zilla->tempdir . q[/build/dist.ini] ), 'dist.ini created' );
+ok( -e ( $zilla->tempdir . q[/build/.dotfile] ), '.dotfile created' );
+ok( -e ( $zilla->tempdir . q[/build/good] ),     'good created' );

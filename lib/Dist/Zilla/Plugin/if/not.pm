@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::if::not;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 # ABSTRACT: Only load a plugin if a condition is false
 
@@ -14,14 +14,24 @@ our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 use Moose qw( has around with );
 use Dist::Zilla::Util qw();
 use Eval::Closure qw( eval_closure );
-use Dist::Zilla::Util::ConfigDumper qw( config_dumper );
 
 with 'Dist::Zilla::Role::PluginLoader::Configurable';
 
 has conditions => ( is => 'ro', lazy_build => 1 );
 sub _build_conditions { return [] }
 
-around 'dump_config' => config_dumper( __PACKAGE__, qw( conditions ) );
+around dump_config => sub {
+  my ( $orig, $self, @args ) = @_;
+  my $config = $self->$orig(@args);
+  my $localconf = $config->{ +__PACKAGE__ } = {};
+
+  $localconf->{conditions} = $self->conditions;
+
+  $localconf->{ q[$] . __PACKAGE__ . '::VERSION' } = $VERSION
+    unless __PACKAGE__ eq ref $self;
+
+  return $config;
+};
 
 around mvp_aliases => sub {
   my ( $orig, $self, @rest ) = @_;
@@ -85,7 +95,7 @@ Dist::Zilla::Plugin::if::not - Only load a plugin if a condition is false
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 METHODS
 
@@ -96,11 +106,11 @@ returns inverted.
 
 =head1 AUTHOR
 
-Kent Fredric <kentfredric@gmail.com>
+Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
