@@ -3,13 +3,14 @@ Release history for Dist-Zilla-Plugin-if
 {{$NEXT}}
  - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
  - Remove use of ConfigDumper util
+ - Remove use of Test::KENTNL/dztest
 
  [Dependencies::Stats]
  - Dependencies changed since 0.002001, see misc/*.deps* for details
  - configure: +1 (recommends: ↑1)
  - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
  - runtime: -1 (recommends: +1)
- - test: +1 ↓1 (recommends: ↑1 ↓1)
+ - test: +1 ↓1 -1 (recommends: ↑1 ↓1)
 
 0.002001 2014-08-29T09:56:30Z
  [Bugfix]

@@ -2,16 +2,12 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 1;
 
 # ABSTRACT: A basic test
 
-use Test::DZil qw( simple_ini );
-use Dist::Zilla::Util::Test::KENTNL 1.001 qw( dztest );
-
-my $t = dztest();
-$t->add_file( 'dist.ini', simple_ini( [ 'if::not' => {} ] ) );
-isnt( $t->safe_configure, undef, "Configure fails without plugin" );
-
-done_testing;
-
+use Test::DZil qw( simple_ini Builder );
+my $files = { 'source/dist.ini' => simple_ini( [ 'if' => {} ] ) };
+my $zilla;
+isnt( eval { $zilla = Builder->from_config( { dist_root => 'invalid' }, { add_files => $files } ); 1 },
+  1, "Configure fails without plugin" );

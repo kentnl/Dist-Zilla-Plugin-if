@@ -2,20 +2,20 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 1;
 
 # ABSTRACT: A basic test
 
-use Test::DZil qw( simple_ini );
-use Dist::Zilla::Util::Test::KENTNL 1.001 qw( dztest );
-use Test::Differences;
-
-my $t = dztest();
-$t->add_file( 'dist.ini', simple_ini( ['MetaConfig'], [ 'if::not' => { dz_plugin => 'GatherDir' } ], ) );
-$t->build_ok;
-
-$t->meta_path_deeply(
-  '/x_Dist_Zilla/plugins/*[ value->{class} !~ /Dist::Zilla::Plugin::FinderCode/ ]/*[key eq q[class]]',
-  [ 'Dist::Zilla::Plugin::MetaConfig', 'Dist::Zilla::Plugin::if::not' ],
+use Test::DZil qw( simple_ini Builder );
+my $files = { 'source/dist.ini' => simple_ini( ['MetaConfig'], [ 'if::not' => { dz_plugin => 'GatherDir' } ] ) };
+my $zilla = Builder->from_config( { dist_root => 'invalid' }, { add_files => $files } );
+$zilla->chrome->logger->set_debug(1);
+$zilla->build;
+is_deeply(
+  [
+    map  { $_->{class} }
+    grep { $_->{class} ne 'Dist::Zilla::Plugin::FinderCode' } @{ $zilla->distmeta->{x_Dist_Zilla}->{plugins} }
+  ],
+  [ 'Dist::Zilla::Plugin::MetaConfig', 'Dist::Zilla::Plugin::if::not', ],
+  "Expected plugins",
 );
-done_testing;

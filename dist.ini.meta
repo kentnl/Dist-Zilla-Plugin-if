@@ -19,7 +19,3 @@ copyfiles         = LICENSE
 srcreadme         = mkdn
 twitter_extra_hash_tags = #distzilla
 ; auto_prereqs_skip = File::Find
-
-[Prereqs]
--phase = test
-Dist::Zilla::Util::Test::KENTNL = 1.003001
