@@ -14,11 +14,21 @@ our $VERSION = '0.002002';
 use Moose qw( has around with );
 use Dist::Zilla::Util qw();
 use Eval::Closure qw( eval_closure );
-use Dist::Zilla::Util::ConfigDumper qw( config_dumper );
 
 with 'Dist::Zilla::Role::PluginLoader::Configurable';
 
-around 'dump_config' => config_dumper( __PACKAGE__, qw( conditions ) );
+around dump_config => sub {
+  my ( $orig, $self, @args ) = @_;
+  my $config = $self->$orig(@args);
+  my $localconf = $config->{ +__PACKAGE__ } = {};
+
+  $localconf->{conditions} = $self->conditions;
+
+  $localconf->{ q[$] . __PACKAGE__ . '::VERSION' } = $VERSION
+    unless __PACKAGE__ eq ref $self;
+
+  return $config;
+};
 
 around mvp_aliases => sub {
   my ( $orig, $self, @rest ) = @_;

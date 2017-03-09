@@ -54,6 +54,9 @@ This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL depen
  - Dist::Zilla::Plugin::MetaYAML
  - Dist::Zilla::Plugin::ReadmeFromPod
 
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
 0.002001 2014-08-29T09:56:30Z
  [Changed / test requires]
  - Dist::Zilla::Util::Test::KENTNL 1.001 → 1.003001
